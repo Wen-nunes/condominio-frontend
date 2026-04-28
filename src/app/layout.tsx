@@ -1,33 +1,26 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Sidebar from "@/components/Sidebar"; // Importando a Sidebar
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Sistema de Gestão de Condomínios",
-  description: "Sistema completo de gestão de condomínios com CRUD para todas as entidades",
+  title: "UniCondo - Gestão de Condomínios",
+  description: "Sistema completo de gestão",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="pt-br" className={`${geistSans.variable} h-full antialiased`}>
+      <body className="flex h-screen bg-brand-dark overflow-hidden">
+        {/* Aqui entra a Sidebar ao lado do conteúdo */}
+        <Sidebar /> 
+        
+        <main className="flex-1 overflow-y-auto bg-brand-dark">
+          {children}
+        </main>
+      </body>
     </html>
   );
 }

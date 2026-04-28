@@ -1,26 +1,44 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Paleta New Spring */
+  --brand-dark: #1C2621;
+  --brand-olive: #6E7346;
+  --brand-sage: #BFBDA3;
+  --brand-cream: #F2F0D5;
+  --brand-accent: #D97652;
+
+  --background: var(--brand-dark);
+  --foreground: var(--brand-cream);
+  
+  /* Cores de Card (um tom levemente mais claro que o fundo) */
+  --card: #232f29; 
+  --border: var(--brand-olive);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-olive: var(--brand-olive);
+  --color-brand-sage: var(--brand-sage);
+  --color-brand-cream: var(--brand-cream);
+  --color-brand-accent: var(--brand-accent);
+  --color-card-bg: var(--card);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+/* Scrollbar personalizada para combinar com o tema escuro */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--brand-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--brand-olive);
+  border-radius: 10px;
 }
