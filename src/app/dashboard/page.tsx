@@ -6,20 +6,62 @@ import {
   Users, UserCheck, Construction, UserPlus, 
   Home, MapPin, CalendarDays, Barcode, 
   Megaphone, FileSignature, CreditCard, 
-  ArrowUpCircle, ArrowDownCircle, LayoutDashboard
+  ArrowUpCircle, ArrowDownCircle, LayoutDashboard,
+  Loader2 // Importei um ícone de carregamento
 } from "lucide-react";
+
+// Interface para tipar os dados que vêm da API
+interface DashboardStats {
+  totalMoradores: number;
+  boletosAberto: number;
+  reservasHoje: number;
+  comunicadosAtivos: number;
+}
 
 export default function Dashboard() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  
+  // Estado para armazenar os números reais
+  const [stats, setStats] = useState<DashboardStats>({
+    totalMoradores: 0,
+    boletosAberto: 0,
+    reservasHoje: 0,
+    comunicadosAtivos: 0
+  });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       router.replace("/login");
-    } else {
-      setLoading(false);
+      return;
     }
+
+    // Função para buscar dados do Backend
+    const fetchDashboardData = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/dashboard/stats", {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar KPIs:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+
+    // Opcional: Atualiza os dados automaticamente a cada 1 minuto
+    const interval = setInterval(fetchDashboardData, 60000);
+    return () => clearInterval(interval);
   }, [router]);
 
   const menuItems = [
@@ -38,11 +80,16 @@ export default function Dashboard() {
     { name: "Contas a Receber", href: "/contas-receber", icon: <ArrowUpCircle size={24} />, desc: "Entradas de Caixa" },
   ];
 
-  if (loading) return null;
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <Loader2 className="animate-spin text-brand-accent" size={48} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700 pb-12">
-      {/* SEÇÃO DE BOAS-VINDAS */}
       <div className="flex flex-col gap-1">
         <h2 className="text-3xl font-bold text-brand-cream flex items-center gap-3">
           <LayoutDashboard className="text-brand-accent" size={32} />
@@ -51,26 +98,34 @@ export default function Dashboard() {
         <p className="text-brand-sage">Visão geral do Condomínio New Spring.</p>
       </div>
 
-      {/* CARDS DE RESUMO (KPIs Estilo uCondo) */}
+      {/* CARDS COM DADOS REAIS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-card-bg border border-brand-olive/30 p-6 rounded-2xl shadow-xl group hover:border-brand-accent/50 transition-all">
           <p className="text-brand-sage text-xs font-bold uppercase tracking-widest">Total de Moradores</p>
-          <h3 className="text-4xl font-bold text-brand-cream mt-2 group-hover:text-brand-accent transition-colors">128</h3>
+          <h3 className="text-4xl font-bold text-brand-cream mt-2 group-hover:text-brand-accent transition-colors">
+            {stats.totalMoradores.toString().padStart(2, '0')}
+          </h3>
         </div>
         
         <div className="bg-card-bg border border-brand-olive/30 p-6 rounded-2xl shadow-xl group hover:border-brand-accent/50 transition-all">
           <p className="text-brand-sage text-xs font-bold uppercase tracking-widest">Boletos em Aberto</p>
-          <h3 className="text-4xl font-bold text-brand-accent mt-2">14</h3>
+          <h3 className="text-4xl font-bold text-brand-accent mt-2">
+            {stats.boletosAberto.toString().padStart(2, '0')}
+          </h3>
         </div>
 
         <div className="bg-card-bg border border-brand-olive/30 p-6 rounded-2xl shadow-xl group hover:border-brand-accent/50 transition-all">
           <p className="text-brand-sage text-xs font-bold uppercase tracking-widest">Reservas Hoje</p>
-          <h3 className="text-4xl font-bold text-brand-cream mt-2">03</h3>
+          <h3 className="text-4xl font-bold text-brand-cream mt-2">
+          {(stats?.reservasHoje ?? 0).toString().padStart(2, '0')}
+          </h3>
         </div>
 
         <div className="bg-card-bg border border-brand-olive/30 p-6 rounded-2xl shadow-xl group hover:border-brand-accent/50 transition-all">
           <p className="text-brand-sage text-xs font-bold uppercase tracking-widest">Comunicados Ativos</p>
-          <h3 className="text-4xl font-bold text-brand-cream mt-2">05</h3>
+          <h3 className="text-4xl font-bold text-brand-cream mt-2">
+            {stats.comunicadosAtivos.toString().padStart(2, '0')}
+          </h3>
         </div>
       </div>
 
